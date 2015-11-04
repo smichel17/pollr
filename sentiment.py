@@ -16,10 +16,12 @@ def readList(filename):
 		sad_log_probs[tokens[0]] = float(tokens[2])
 	return happy_log_probs, sad_log_probs
 
+# Naive Bayes Analysis
 def analyse_sentiment(sentence, happy, sad):
+	useless_words = []
 	tokens = sentence.rstrip().split(" ")
-	happy_log_prob = numpy.sum([happy[token] for token in tokens if token in happy])
-	sad_log_prob = numpy.sum([sad[token] for token in tokens if token in sad])
+	happy_log_prob = numpy.sum([happy[token] for token in tokens if token in happy and token not in useless_words])
+	sad_log_prob = numpy.sum([sad[token] for token in tokens if token in sad and token not in useless_words])
 	happy_prob = numpy.reciprocal(numpy.exp(sad_log_prob - happy_log_prob) + 1)
 	sad_prob = 1 - happy_prob
 	return happy_prob, sad_prob
