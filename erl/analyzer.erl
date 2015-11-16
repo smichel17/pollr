@@ -1,0 +1,2 @@
+-module(analyzer).
+-export([analyze/1]).
