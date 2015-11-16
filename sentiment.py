@@ -1,4 +1,4 @@
-import numpy, sys
+import numpy, sys, os
 
 def readList(filename):
 	f = open(filename, 'r')
@@ -27,6 +27,9 @@ def analyse_sentiment(sentence, happy, sad):
 	return happy_prob, sad_prob
 
 def main(argv):
+	if len(argv) < 2:
+		print("usage: python sentiment.py [wordlist_filename]")
+		os._exit(1)
 	print("Enter a sentence: ")
 	sample = input("")
 	# First argument is filename of word list
