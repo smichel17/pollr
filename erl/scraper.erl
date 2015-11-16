@@ -1,0 +1,2 @@
+-module(scraper).
+-export([scrape/1]).
