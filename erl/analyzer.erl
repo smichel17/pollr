@@ -1,8 +1,9 @@
 -module(analyzer).
 -export([analyze/2]).
 
-analyze(Tweet, _Hashtag) ->
+analyze(Tweet, Hashtag) ->
 	{ok, P} = python:start([{python_path, "./python"},
                          	{python, "python3"}]),
-	python:call(P, sentiment, analyze, [Tweet]).
+	% Send back the tuple of happy probability and sad probability
+	Hashtag ! python:call(P, sentiment, analyze, [Tweet]).
 	
