@@ -4,6 +4,7 @@
 %% This is our MVP. Call master:test(Hashtag) and it returns the score.
 
 test(Query) ->
+    register(master, self()),
     scraper:scrape(Query),
     receive
         {score, _HashTag, Score} -> Score

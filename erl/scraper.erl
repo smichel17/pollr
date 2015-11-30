@@ -4,6 +4,11 @@
 scrape(Query) ->
 	{ok, P} = python:start([{python_path, "./python"},
                          	{python, "python3"}]),
+    Tweetlist = python:call(P, scraper, search, [Query]),
+    % THIS COMMENT IS DEPRECATED:
 	% Send back the tuple of happy probability and sad probability
-	whereis(master) ! python:call(P, scraper, search, [Query]),
+    whereis(master) ! {score, Query, analyze(Tweetlist)), 
 	python:stop(P).
+
+
+analyze(Tweetlist) -> 0.5. %stub
