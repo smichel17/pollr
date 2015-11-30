@@ -7,7 +7,7 @@ scrape(Query) ->
     Tweetlist = python:call(P, scraper, search, [Query]),
     % THIS COMMENT IS DEPRECATED:
 	% Send back the tuple of happy probability and sad probability
-    whereis(master) ! {score, Query, analyze(Tweetlist)), 
+    whereis(master) ! {score, Query, analyze(Tweetlist)}, 
 	python:stop(P).
 
 
