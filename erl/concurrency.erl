@@ -1,10 +1,6 @@
 -module(concurrency).
 -export([map/2]).
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%      Parallel Map       %%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 % Calls a helper function that recursively spawns threads to process each 
 % element that rebuild the new list through message passing. Receives the
 % final list through a message passed from the initially spawned process
