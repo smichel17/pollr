@@ -10,7 +10,8 @@
 % final list through a message passed from the initially spawned process
 % and returns the list
 map(F, XS) -> 
-    ElementProcessorPID = spawn(fun() -> element_processor(self(), F, XS) end),
+    Pid = self(),
+    ElementProcessorPID = spawn(fun() -> element_processor(Pid, F, XS) end),
     receive
         {ElementProcessorPID, YS} -> YS
     end.
@@ -25,7 +26,8 @@ element_processor(ReplyPid, _F, []) ->
 % Process the first element and then when the new process sends back the rest
 % of the list, concatenate them together and reply with the processed list
 element_processor(ReplyPid,  F, [H | T]) ->
-    NextElemPid = spawn(fun() -> element_processor(self(), F, T) end),
+    Pid = self(),
+    NextElemPid = spawn(fun() -> element_processor(Pid, F, T) end),
     X = F(H),
     receive
         {NextElemPid, XS} -> ReplyPid ! {self(), [X | XS]}
