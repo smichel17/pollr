@@ -5,9 +5,9 @@ analyze(Tweet) ->
 	{ok, P} = python:start([{python_path, "./python"},
                          	{python, "python3"}]),
 	% Send back the tuple of happy probability and sad probability
-	Score = python:call(P, sentiment, analyze, [Tweet]),
+	{Pos, _Neg} = python:call(P, sentiment, analyze, [Tweet]),
 	python:stop(P),
-	Score.
+	Pos.
 
 analyze_tweets(Tweets) -> 
 	Scores = concurrency:map(fun(T) -> analyze(T) end, Tweets),
