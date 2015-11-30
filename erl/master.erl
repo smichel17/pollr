@@ -1,6 +1,15 @@
 -module(master).
--export([start/0]).
+-export([start/0, test/1]).
 
+%% This is our MVP. Call master:test(Hashtag) and it returns the score.
+
+test(Query) ->
+    scraper:scrape(Query),
+    receive
+        {score, _HashTag, Score} -> Score
+    end.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 start() ->
     register(master, self()),
@@ -10,7 +19,7 @@ start() ->
 
 loop(HashList) ->
     receive
-        {Hashtag} -> scraper:scrape(Hashtag);
+        {Query} -> scraper:scrape(Query);
         {score, Hashtag, Score} -> loop([{Hashtag, Score}|HashList]);
         {whatis, Hashtag} ->
             Score = score(Hashtag, HashList),
