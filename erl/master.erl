@@ -21,8 +21,8 @@ start() ->
 loop(HashList) ->
     receive
         {Query} -> scraper:scrape(Query);
-        {score, Hashtag, Score} -> loop([{Hashtag, Score}|HashList]);
-        {whatis, Hashtag} ->
+        {result, Hashtag, Score} -> loop([{Hashtag, Score}|HashList]);
+        {lookup, Hashtag, Pid} ->
             Score = score(Hashtag, HashList),
             case Score = not_found of
                 true -> scraper:scrape(Hashtag);
