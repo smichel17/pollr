@@ -26,9 +26,11 @@ def analyze_sentiment(sentence, happy, sad):
 	sad_prob = 1 - happy_prob
 	return happy_prob, sad_prob
 
+# Converts Erlang style strings into python style strings
 def convert(sentence):
 	return ''.join(chr(i) for i in sentence)
 
+# Calculates the sentiment probabilities for each word in a sentence / tweet
 def analyze(sentence):
 	sentence = convert(sentence)
 	tags = hashtags(sentence)
@@ -37,6 +39,7 @@ def analyze(sentence):
 	happy_prob, sad_prob = analyze_sentiment(sentence, happy_log_probs, sad_log_probs)
 	return float(happy_prob), float(sad_prob)
 
+# Removes characters that will hinder a word from being potentially scored
 def clean(tweet):
 	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?'
 	for char in bad_characters:
@@ -44,14 +47,19 @@ def clean(tweet):
 	tweet = ' '.join([token for token in tweet.split(' ') if not token.startswith("#")])
 	return tweet
 
+# Returns a list of hashtags in a sentence
 def hashtags(tweet):
 	tweet = convert(tweet)
 	tags = [token for token in tweet.split(' ') if token.startswith("#")]
 	return tags
 
-def mergeListsByFrequency(hashtagLists):
+# Takes a list of hashtag lists and returns the set of hashtags sorted by frequency
+def mergeHashTagLists(hashtagLists):
+	# flatten the list
 	all_hashtags = [convert(item) for sublist in hashtagLists for item in sublist]
+	# Calculate number of occurrences of each item
 	counts = collections.Counter(all_hashtags)
+	# Sort by occurrence and reduce the list into a set
 	return sorted(list(set(all_hashtags)), key=lambda x: -counts[x])
 
 def main(argv):

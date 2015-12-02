@@ -15,7 +15,7 @@ analyze_hashtags(Tweets) ->
 	{ok, P} = python:start([{python_path, "./python"},
                          	{python, "python3"}]),
 	% Send back the tuple of happy probability and sad probability
-	Hashtags = python:call(P, sentiment, mergeListsByFrequency,[HashtagLists]),
+	Hashtags = python:call(P, sentiment, mergeHashTagLists, [HashtagLists]),
 	python:stop(P),
 	Hashtags.
 
