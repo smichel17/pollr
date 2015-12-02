@@ -24,7 +24,7 @@ loop(HashList) ->
         {score, Hashtag, Score} -> loop([{Hashtag, Score}|HashList]);
         {whatis, Hashtag} ->
             Score = score(Hashtag, HashList),
-            case Score = not_found of
+            case Score == not_found of
                 true -> scraper:scrape(Hashtag);
                 false -> whereis(interface) ! {Hashtag, Score}
             end
