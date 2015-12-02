@@ -28,11 +28,22 @@ def analyze_sentiment(sentence, happy, sad):
 
 def analyze(sentence):
 	sentence = ''.join(chr(i) for i in sentence)
+	tags = hashtags(sentence)
+	sentence = clean(sentence)
 	happy_log_probs, sad_log_probs = readList("./wordlists/top20000.txt")
 	happy_prob, sad_prob = analyze_sentiment(sentence, happy_log_probs, sad_log_probs)
-	# return (happy_prob, sad_prob)
-	# return "P(happy) = " + str(happy_prob) + "\nP(sad)   = " + str(sad_prob)
-	return float(happy_prob), float(sad_prob)
+	return float(happy_prob), float(sad_prob), tags
+
+def clean(tweet):
+	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?'
+	for char in bad_characters:
+		tweet = tweet.replace(char, '')
+	tweet = ' '.join([token for token in tweet.split(' ') if not token.startswith("#")])
+	return tweet
+
+def hashtags(tweet):
+	tags = [token for token in tweet.split(' ') if token.startswith("#")]
+	return tags
 
 def main(argv):
 	if len(argv) < 2:

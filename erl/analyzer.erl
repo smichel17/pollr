@@ -11,6 +11,8 @@ analyze(Tweet) ->
 
 analyze_tweets(Tweets) -> 
 	Scores = concurrency:map(fun(T) -> analyze(T) end, Tweets),
-	SumOfScores = lists:foldl(fun(X, Sum) -> X + Sum end, 0, Scores),
-	SumOfScores / length(Scores).
+	case lists:foldl(fun(X, Sum) -> X + Sum end, 0, Scores) of
+		0 -> -1;
+		SumOfScores -> SumOfScores / length(Scores)
+	end.
 
