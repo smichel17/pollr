@@ -1,4 +1,4 @@
-import numpy, sys, os
+import numpy, sys, os, collections
 
 def readList(filename):
 	f = open(filename, 'r')
@@ -26,13 +26,16 @@ def analyze_sentiment(sentence, happy, sad):
 	sad_prob = 1 - happy_prob
 	return happy_prob, sad_prob
 
+def convert(sentence):
+	return ''.join(chr(i) for i in sentence)
+
 def analyze(sentence):
-	sentence = ''.join(chr(i) for i in sentence)
+	sentence = convert(sentence)
 	tags = hashtags(sentence)
 	sentence = clean(sentence)
 	happy_log_probs, sad_log_probs = readList("./wordlists/top20000.txt")
 	happy_prob, sad_prob = analyze_sentiment(sentence, happy_log_probs, sad_log_probs)
-	return float(happy_prob), float(sad_prob), tags
+	return float(happy_prob), float(sad_prob)
 
 def clean(tweet):
 	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?'
@@ -42,8 +45,14 @@ def clean(tweet):
 	return tweet
 
 def hashtags(tweet):
+	tweet = convert(tweet)
 	tags = [token for token in tweet.split(' ') if token.startswith("#")]
 	return tags
+
+def mergeListsByFrequency(hashtagLists):
+	all_hashtags = [convert(item) for sublist in hashtagLists for item in sublist]
+	counts = collections.Counter(all_hashtags)
+	return sorted(list(set(all_hashtags)), key=lambda x: -counts[x])
 
 def main(argv):
 	if len(argv) < 2:

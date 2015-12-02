@@ -4,8 +4,8 @@
 scrape(Query) ->
 	{ok, P} = python:start([{python_path, "./python"},
                          	{python, "python3"}]),
-	% Generate a list of tweets matching the query
     Tweetlist = python:call(P, scraper, search, [Query]),
-    % Send to master the average sentiment of the resulting tweets
-    whereis(master) ! {result, Query, analyzer:analyze_tweets(Tweetlist)}, 
+    Sentiment = analyzer:analyze_tweets(Tweetlist),
+    Hashtags  = analyzer:analyze_hashtags(Tweetlist),
+    whereis(master) ! {result, Query, Sentiment, Hashtags}, 
 	python:stop(P).
