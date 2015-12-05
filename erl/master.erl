@@ -53,21 +53,24 @@ background_scheduler() ->
         Hashtag -> scraper:scrape(Hashtag)
     end,
     receive
-    after BFREQ -> background_scheduler()
+    after ?BFREQ -> background_scheduler()
     end.
 
-priority_scheduler() -> priority_scheduler(NUM_PRIORITY_THREADS).
+priority_scheduler() -> priority_scheduler(?NUM_PRIORITY_THREADS).
 
 priority_scheduler(0) -> 
     receive
-    after PFREQ -> priority_scheduler(1)
+    after ?PFREQ -> priority_scheduler(1)
     end;
 
+% I am really not sure what line 73 is trying to do here... 
+% If it doesn't succeed in getting a Hashtag in 10 seconds, it tries
+% to increase the number of allowed schedules by 1? ~ Gabe
 priority_scheduler(N) ->
     receive
         Hashtag -> scraper:scrape(Hashtag),
                    priority_scheduler(N-1)
-    after PREQ -> priority_scheduler(min_of(N+1, NUM_PRIORITY_THREADS))
+    after ?PFREQ -> priority_scheduler(min_of(N+1, ?NUM_PRIORITY_THREADS))
     end.
 
 %% Helper Functions %%
