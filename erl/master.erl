@@ -10,7 +10,7 @@ test(Query) ->
     register(master, self()),
     scraper:scrape(Query),
     receive
-        {score, _HashTag, Score} -> Score
+        {result, _Query, Sentiment, _Hashtags} -> Sentiment
     end.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -20,9 +20,9 @@ test(Query) ->
 start() ->
     HashList = [{null, null}],          %{Hashtag, Score}
     Requests = [{null, {null, null}}],  %{Hashtag, Requestor}
-    register(priority_scheduler, spawn(priority_scheduler)),
-    register(background_scheduler, spawn(background_scheduler)),
-    register(master, spawn(master, loop, [HashList, Requests])),
+    register(priority_scheduler, spawn(fun() -> priority_scheduler() end)),
+    register(background_scheduler, spawn(fun() -> background_scheduler() end)),
+    register(master, spawn(fun() -> loop(HashList, Requests) end)),
     ok.
 
 

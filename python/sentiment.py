@@ -28,12 +28,12 @@ def analyze_sentiment(sentence, happy, sad):
 
 # Converts Erlang style strings into python style strings
 def convert(sentence):
+	# print(sentence)
 	return ''.join(chr(i) for i in sentence)
 
 # Calculates the sentiment probabilities for each word in a sentence / tweet
 def analyze(sentence):
 	sentence = convert(sentence)
-	tags = hashtags(sentence)
 	sentence = clean(sentence)
 	happy_log_probs, sad_log_probs = readList("./wordlists/top20000.txt")
 	happy_prob, sad_prob = analyze_sentiment(sentence, happy_log_probs, sad_log_probs)
