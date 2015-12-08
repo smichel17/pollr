@@ -44,7 +44,6 @@ def build_hashtag_db():
         cur = con.cursor()    
         cur.execute("DROP TABLE IF EXISTS Hashtags")
         cur.execute("CREATE TABLE Hashtags(Hashtag TEXT, Pos INT, Neg INT)")
-        cur.execute("INSERT INTO Hashtags VALUES('#DonaldTrump', 0.75, 0.25)")
 
 def get_hashtag_sentiment_erl(hashtag):
     hashtag = convert(hashtag)
@@ -91,7 +90,11 @@ def build_queue_db():
         cur = con.cursor()    
         cur.execute("DROP TABLE IF EXISTS Queue")
         cur.execute("CREATE TABLE Queue(Hashtag TEXT, Requests INT)")
-        cur.execute("INSERT INTO Queue VALUES('#HillaryClinton', 20)")
+        cur.execute("INSERT INTO Queue VALUES('#HillaryClinton', 400)")
+        cur.execute("INSERT INTO Queue VALUES('#Winter', 600)")
+        cur.execute("INSERT INTO Queue VALUES('#StarWars', 500)")
+        cur.execute("INSERT INTO Queue VALUES('#Adele', 300)")
+        cur.execute("INSERT INTO Queue VALUES('#College', 1000)")
 
 def most_requested_hashtag_erl():
     con = lite.connect('./db/sentiment.db')
