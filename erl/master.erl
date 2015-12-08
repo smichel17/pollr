@@ -1,7 +1,7 @@
 -module(master).
 -export([start/0, test/1]).
--define(FREQ, 3000). % Priority (user-generated) API call frequency
--define(RESERVED_API_CALLS, 2).
+-define(FREQ, 6000). % Priority (user-generated) API call frequency
+-define(RESERVED_API_CALLS, 3).
 
 %% This is our MVP. Call master:test(Hashtag) and it returns the score.
 
@@ -14,6 +14,13 @@ test(Query) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+flush() ->
+    receive
+       M -> io:format("FLUSHING: ~p~n",[M]),
+            flush()
+    after 0 -> ok
+    end.
+
 %% Core Functions %%
 
 start() ->
@@ -24,12 +31,16 @@ start() ->
 
 % Listen for and keep track of requests and results. Message as appropriate.
 loop(Requests) ->
+    io:format("Requests: ~p~n", [Requests]),
+    flush(),
     receive
         {result, Hashtag, Score, HashtagList} -> 
-            crawl(HashtagList),
+            io:format("result: {Hashtag, Score}: {~p, ~p}~n", [Hashtag, Score]),
+            spawn(fun() -> crawl(HashtagList) end),
             db:update(Hashtag, Score),
             loop(lookup(Hashtag, Requests));
         {lookup, Hashtag, Requestor} ->
+            io:format("lookup: {Hashtag, Requestor}: {~p, ~p}~n", [Hashtag, Requestor]),
             Score = db:score_of(Hashtag),
             case Score of
                 not_found -> whereis(scheduler) ! Hashtag,
@@ -73,6 +84,7 @@ background_scheduler() ->
 % Put all hashtags in the list into the background queue.
 crawl([]) -> ok;
 crawl([H|T]) ->
+    io:format("Crawl: ~p~n", [H]),
     db:request(H),
     crawl(T).
 
