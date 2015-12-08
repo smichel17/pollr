@@ -7,7 +7,7 @@ def convert(sentence):
 
 # Removes characters that will hinder a word from being potentially scored
 def clean(tweet):
-	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?\n'
+	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?\n\t' + chr(8230) #...
 	for char in bad_characters:
 		tweet = tweet.replace(char, '')
 	return tweet
