@@ -1,7 +1,14 @@
 -module(db).
--export([next_hashtag/0, request/1, remove/1, score_of/1, update/2]).
+-export([spawn_db/0, next_hashtag/0, request/1, remove/1, score_of/1, update/2]).
 
 %%These all work on the DB for hashtags to be crawled %%
+
+spawn_db() ->
+	{ok, P} = python:start([{python_path, "./python"},
+                         	{python, "python3"}]),
+	python:call(P, db, build_db_scratch, []),
+	python:stop(P),
+	ok. 
 
 % return the hashtag with the highest number of requests
 next_hashtag() -> 

@@ -99,7 +99,6 @@ def most_requested_hashtag_erl():
         cur = con.cursor() 
         cur.execute("SELECT Hashtag, Requests FROM Queue ORDER BY Requests DESC")
         result = cur.fetchone()
-        print(cur.fetchall())
         if result is not None:
             return result[0]
         return None
