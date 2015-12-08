@@ -33,9 +33,14 @@ def analyze(sentence):
 				pos, neg = result
 				pos_log_prob += pos
 				neg_log_prob += neg
-	pos_prob = numpy.reciprocal(numpy.exp(neg_log_prob - pos_log_prob) + 1)
-	neg_prob = 1 - pos_prob
-	return float(pos_prob), float(neg_prob)
+	try:
+		pos_prob = numpy.reciprocal(numpy.exp(neg_log_prob - pos_log_prob) + 1)
+		neg_prob = 1 - pos_prob
+	except:
+		print("Calculation Failed... defaulting to 0.5")
+		return float(0.5), float(0.5)
+	else:
+		return float(pos_prob), float(neg_prob)
 
 # Returns a list of hashtags in a sentence
 def hashtags(tweet):
