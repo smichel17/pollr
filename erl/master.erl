@@ -18,7 +18,7 @@ flush() ->
     receive
        M -> io:format("FLUSHING: ~p~n",[M]),
             flush()
-    after 0 -> ok
+    %after 1 -> ok
     end.
 
 %% Core Functions %%
@@ -32,7 +32,7 @@ start() ->
 % Listen for and keep track of requests and results. Message as appropriate.
 loop(Requests) ->
     io:format("Requests: ~p~n", [Requests]),
-    flush(),
+    %flush(),
     receive
         {result, Hashtag, Score, HashtagList} -> 
             io:format("result: {Hashtag, Score}: {~p, ~p}~n", [Hashtag, Score]),
@@ -73,17 +73,22 @@ scheduler() -> scheduler(0).
 background_scheduler() ->
     receive
         next -> Hashtag = db:next_hashtag(),
-                io:format("Background scrape: ~p~n", [Hashtag]),
-                analyze(Hashtag),
-                db:remove(Hashtag)
-    end,
-    background_scheduler().
+                case Hashtag of
+                    not_found -> io:format("Nothing to scrape."),
+                                 background_scheduler();
+                    _ -> io:format("Background scrape: ~p~n", [Hashtag]),
+                         analyze(Hashtag),
+                         db:remove(Hashtag),
+                         background_scheduler()
+                end
+    end.
 
 %% Helper Functions %%
 
 % Put all hashtags in the list into the background queue.
 crawl([]) -> ok;
 crawl([H|T]) ->
+    %io:format("."),
     %io:format("Crawl: ~p~n", [H]),
     db:request(H),
     crawl(T).
