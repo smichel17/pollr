@@ -17,22 +17,27 @@ next_hashtag() ->
 	Hashtag = python:call(P, db, most_requested_hashtag_erl, []),
 	python:stop(P),
 	if 
-		Hashtag == undefined -> not_found;
-		true -> Hashtag
+		Hashtag == undefined -> 
+			not_found;
+		true -> 
+			Score = score_of(Hashtag),
+			if
+				Score == not_found ->
+					Hashtag;
+				true ->
+					remove(Hashtag),
+					next_hashtag()
+			end
 	end.
 
 % If Hashtag is not in the DB, add it with counter = 1.
 % If it is, increment the counter.
 request(Hashtag) -> 
-    case score_of(Hashtag) of
-        not_found -> {ok, P} = python:start([{python_path, "./python"},
-                         	                          {python, "python3"}]),
-                     python:call(P, db, update_requested_hashtag_erl,
-                                                                [Hashtag]),
-                     python:stop(P),
-                     ok;
-        _ -> ok
-    end.
+    {ok, P} = python:start([{python_path, "./python"},
+                         	{python, "python3"}]),
+	python:call(P, db, update_requested_hashtag_erl, [Hashtag]),
+	python:stop(P),
+	ok. 
 
 remove(Hashtag) -> 
 	{ok, P} = python:start([{python_path, "./python"},
