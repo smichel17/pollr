@@ -90,11 +90,6 @@ def build_queue_db():
         cur = con.cursor()    
         cur.execute("DROP TABLE IF EXISTS Queue")
         cur.execute("CREATE TABLE Queue(Hashtag TEXT, Requests INT)")
-        cur.execute("INSERT INTO Queue VALUES('#DonaldTrump', 400)")
-        cur.execute("INSERT INTO Queue VALUES('#Winter', 600)")
-        cur.execute("INSERT INTO Queue VALUES('#StarWars', 500)")
-        cur.execute("INSERT INTO Queue VALUES('#Adele', 300)")
-        cur.execute("INSERT INTO Queue VALUES('#College', 200)")
 
 def most_requested_hashtag_erl():
     con = lite.connect('./db/sentiment.db')
