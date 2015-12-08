@@ -48,7 +48,9 @@ def get_hashtag_sentiment(hashtag):
         cur.execute("SELECT Pos FROM Hashtags WHERE Hashtag=:Hashtag", {"Hashtag": hashtag})        
         con.commit()
         result = cur.fetchone()
-        return result[0] if result != None else None
+        if result is None:
+            return None
+        return result[0]
 
 def get_hashtag_sentiment_log(hashtag):
     con = lite.connect('./db/sentiment.db')
@@ -57,4 +59,6 @@ def get_hashtag_sentiment_log(hashtag):
         cur.execute("SELECT Pos, Neg FROM Hashtags WHERE Hashtag=:Hashtag", {"Hashtag": hashtag})        
         con.commit()
         result = cur.fetchone()
-        return math.log(result[0]), math.log(result[1]) if result != None else None
+        if result is None:
+            return None
+        return math.log(result[0]), math.log(result[1])
