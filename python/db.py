@@ -9,6 +9,7 @@ def convert(sentence):
 def build_db_scratch():
     build_word_db()
     build_hashtag_db()
+    build_queue_db()
 
 def readList(filename):
     words = []
@@ -83,3 +84,45 @@ def set_hashtag_sentiment_erl(hashtag, score):
         else:
             cur.execute("UPDATE Hashtags SET Pos=?, Neg=? WHERE Hashtag=?", (score, 1-score, hashtag))        
             con.commit()
+
+def build_queue_db():
+    con = lite.connect('./db/sentiment.db')
+    with con:
+        cur = con.cursor()    
+        cur.execute("DROP TABLE IF EXISTS Queue")
+        cur.execute("CREATE TABLE Queue(Hashtag TEXT, Requests INT)")
+        cur.execute("INSERT INTO Queue VALUES('#HillaryClinton', 20)")
+
+def most_requested_hashtag_erl():
+    con = lite.connect('./db/sentiment.db')
+    with con:
+        cur = con.cursor() 
+        cur.execute("SELECT Hashtag, Requests FROM Queue ORDER BY Requests DESC")
+        result = cur.fetchone()
+        print(cur.fetchall())
+        if result is not None:
+            return result[0]
+        return None
+
+def update_requested_hashtag_erl(hashtag):
+    hashtag = convert(hashtag)
+    con = lite.connect('./db/sentiment.db')
+    with con:
+        # Test if hashtag is already in the db
+        cur = con.cursor() 
+        cur.execute("SELECT Hashtag, Requests FROM Queue WHERE Hashtag=?", (hashtag,))        
+        con.commit()
+        # React accordingly -- that is add a new value or update existing one
+        result = cur.fetchone()
+        if result is None:
+            cur.execute("INSERT INTO Queue VALUES(?, ?)", (hashtag, 1))
+        else:
+            cur.execute("UPDATE Queue SET Requests=? WHERE Hashtag=?", (result[1]+1, hashtag))        
+            con.commit()
+
+def delete_requested_hashtag_erl(hashtag):
+    hashtag = convert(hashtag)
+    con = lite.connect('./db/sentiment.db')
+    with con:
+        cur = con.cursor() 
+        cur.execute("DELETE FROM Queue WHERE Hashtag=?", (hashtag,))
