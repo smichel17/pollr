@@ -11,13 +11,7 @@ analyze_sentiment(Tweets) ->
 
 % Given a list of tweets, computes a list of hashtags found in the tweets
 analyze_hashtags(Tweets) -> 
-	HashtagLists = concurrency:map(fun(T) -> hashtags(T) end, Tweets),
-	{ok, P} = python:start([{python_path, "./python"},
-                         	{python, "python3"}]),
-	% Send back the tuple of happy probability and sad probability
-	Hashtags = python:call(P, sentiment, mergeHashTagLists, [HashtagLists]),
-	python:stop(P),
-	Hashtags.
+	lists:flatten(concurrency:map(fun(T) -> hashtags(T) end, Tweets)).
 
 % Given a tweet, analyzes the sentiment of each word and computes the overall
 % probability of the tweet to be pleasant / happy.
