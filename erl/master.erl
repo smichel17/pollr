@@ -1,7 +1,7 @@
 -module(master).
 -export([start/0, test/1]).
 -define(FREQ, 3000). % Priority (user-generated) API call frequency
--define(RESERVED_API_CALLS, 1).
+-define(RESERVED_API_CALLS, 2).
 
 %% This is our MVP. Call master:test(Hashtag) and it returns the score.
 
@@ -44,11 +44,13 @@ loop(Requests) ->
 scheduler(N) ->
     case N of
         0 -> receive after ?FREQ -> scheduler(1) end;
-        ?RESERVED_API_CALLS -> whereis(background_scheduler) ! next,
-                               scheduler(N-1);
+        ?RESERVED_API_CALLS ->
+            whereis(background_scheduler) ! next,
+            receive after ?FREQ -> scheduler(N-1);
         _ -> receive
-                  Hashtag -> io:format("Foreground scrape: ~p~n", [Hashtag]),
-                             analyze(Hashtag), scheduler(N-1)
+                  Hashtag ->
+                     io:format("Foreground scrape: ~p~n", [Hashtag]),
+                     analyze(Hashtag), scheduler(N-1)
              after ?FREQ -> scheduler(N+1)
              end
     end.
