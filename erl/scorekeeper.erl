@@ -1,2 +1,0 @@
--module(scorekeeper).
--export([start/0]).

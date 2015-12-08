@@ -1,8 +1,7 @@
 -module(master).
--export([start/0, test/1, loop/2]).
--define(BFREQ, 10000). % Background crawling API call frequency
--define(PFREQ, 10000). % Priority (user-generated) API call frequency
--define(NUM_PRIORITY_THREADS, 5).
+-export([start/0, test/1]).
+-define(FREQ, 3000). % Priority (user-generated) API call frequency
+-define(RESERVED_API_CALLS, 1).
 
 %% This is our MVP. Call master:test(Hashtag) and it returns the score.
 
@@ -18,102 +17,98 @@ test(Query) ->
 %% Core Functions %%
 
 start() ->
-    HashList = [{null, null}],          %{Hashtag, Score}
-    Requests = [{null, {null, null}}],  %{Hashtag, Requestor}
-    register(priority_scheduler, spawn(fun() -> priority_scheduler() end)),
+    register(scheduler, spawn(fun() -> scheduler() end)),
     register(background_scheduler, spawn(fun() -> background_scheduler() end)),
-    register(master, spawn(fun() -> loop(HashList, Requests) end)),
+    register(master, spawn(fun() -> loop([]) end)),
     ok.
 
 % Listen for and keep track of requests and results. Message as appropriate.
-loop(HashList, Requests) ->
+loop(Requests) ->
     receive
         {result, Hashtag, Score, HashtagList} -> 
             crawl(HashtagList),
-            Requestor = requested(Hashtag, Requests),
-            case Requestor == not_found of
-                true -> loop([{Hashtag, Score}|HashList], Requests);
-                false -> self() ! {lookup, Hashtag, Requestor},
-                         loop([{Hashtag, Score}|HashList],
-                                  remove(Requestor, Requests))
-            end;
+            db:update(Hashtag, Score),
+            loop(lookup(Hashtag, Requests));
         {lookup, Hashtag, Requestor} ->
-            Score = score(Hashtag, HashList),
-            case Score == not_found of
-                true -> whereis(priority_scheduler) ! Hashtag,
-                        loop(HashList, [{Hashtag, Requestor}|Requests]);
-                false -> Requestor ! {Hashtag, Score},
-                         loop(HashList, Requests)
+            Score = db:score_of(Hashtag),
+            case Score of
+                not_found -> whereis(scheduler) ! Hashtag,
+                             loop([{Hashtag, Requestor}|Requests]);
+                _ -> Requestor ! {Hashtag, Score},
+                     loop(lookup(Hashtag, Requests))
             end
     end.
 
-% Start crawling one hashtag per BFREQ seconds
-background_scheduler() ->
-    receive
-        Hashtag -> spawn(scraper, scrape, [Hashtag])
-    end,
-    receive
-    after ?BFREQ -> background_scheduler()
+% Every FREQ, add a token. Making a request uses a token. If there are
+% RESERVED_API_CALLS tokens already, spend the token on a background request
+scheduler(N) ->
+    case N of
+        0 -> receive after ?FREQ -> scheduler(1) end;
+        ?RESERVED_API_CALLS -> whereis(background_scheduler) ! next,
+                               scheduler(N-1);
+        _ -> receive
+                  Hashtag -> io:format("Foreground scrape: ~p~n", [Hashtag]),
+                             analyze(Hashtag), scheduler(N-1)
+             after ?FREQ -> scheduler(N+1)
+             end
     end.
 
 % Seed with initial value
-priority_scheduler() -> priority_scheduler(?NUM_PRIORITY_THREADS).
+scheduler() -> scheduler(0).
 
-% See comment on priority_scheduler(N).
-% If you've already spawned N threads, enforce a hard rate limit.
-priority_scheduler(0) -> 
+% crawl the next scheduled hashtag whenever prompted
+background_scheduler() ->
     receive
-    after ?PFREQ -> priority_scheduler(1)
-    end;
-
-% Schedule Priority (user-initiated) scrapes. These are also rate limited.
-% However, you can basically "borrow" up to NUM_PRIORITY_THREADS worth of
-% requests, so a user won't be stuck waiting for 10 seconds if they send a few
-% requests in quick succession.
-priority_scheduler(N) ->
-    receive
-        Hashtag -> scraper:scrape(Hashtag),
-                   priority_scheduler(N-1)
-    % Enforce rate limit
-    after ?PFREQ -> priority_scheduler(min_of(N+1, ?NUM_PRIORITY_THREADS))
-    end.
+        next -> Hashtag = db:next_hashtag(),
+                io:format("Background scrape: ~p~n", [Hashtag]),
+                analyze(Hashtag),
+                db:remove(Hashtag)
+    end,
+    background_scheduler().
 
 %% Helper Functions %%
 
 % Put all hashtags in the list into the background queue.
 crawl([]) -> ok;
 crawl([H|T]) ->
-    whereis(background_scheduler) ! H,
+    db:request(H),
     crawl(T).
 
-% Look up the score of a hashtag
-score(Query, [{Hashtag, Score}|T]) ->
-    if
-        Hashtag == Query -> Score;
-        Hashtag == null -> not_found;
-        true -> score(Query, T)
+% Look up if someone is waiting to hear the result of a hashtag
+% and if so, send a query for them
+lookup(_Query, []) -> [];
+lookup(Query, [{Hashtag, Requestor}|T]) ->
+    case Query of
+        Hashtag -> whereis(master) ! {lookup, Hashtag, Requestor},
+                   T;
+        _ -> [{Hashtag, Requestor}|lookup(Query, T)]
     end.
 
-% Look up if someone is waiting to hear the result of a hashtag
-requested(Query, [{Hashtag, Requestor}|T]) ->
-    if
-        Hashtag == Query -> Requestor;
-        Hashtag == null -> not_found;
-        true -> score(Query, T)
-    end.
+analyze(Hashtag) -> spawn(scraper, scrape, [Hashtag]).
+
+%% Old, unused code %%
 
 % Remove a requestor from the list of requestors.
 % Used when we got a result for that person and they've been notified already
-remove(_Requestor, [{null, _}]) -> [{null, {null, null}}];
-remove(Requestor, [{H, R}|T]) ->
-    case Requestor == R of
-        true -> remove(Requestor, T);
-        false -> [{H, R}|remove(Requestor, T)]
-    end.
+%remove(_Requestor, [{null, _}]) -> [{null, {null, null}}];
+%remove(Requestor, [{H, R}|T]) ->
+%    case Requestor == R of
+%        true -> remove(Requestor, T);
+%        false -> [{H, R}|remove(Requestor, T)]
+%    end.
 
 % Return the lower of two ints.
-min_of(A, B) ->
-    case A > B of
-        true -> B;
-        false -> A
-    end.
+%min_of(A, B) ->
+%    case A > B of
+%        true -> B;
+%        false -> A
+%    end.
+
+% Look up the score of a hashtag
+%score(Query, [{Hashtag, Score}|T]) ->
+%    if
+%        Hashtag == Query -> Score;
+%        Hashtag == null -> not_found;
+%        true -> score(Query, T)
+%    end.
+
