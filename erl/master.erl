@@ -1,5 +1,6 @@
 -module(master).
 -export([start/0, test/1]).
+
 -define(FREQ, 6000). % Priority (user-generated) API call frequency
 -define(RESERVED_API_CALLS, 3).
 
