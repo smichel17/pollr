@@ -84,7 +84,7 @@ background_scheduler() ->
 % Put all hashtags in the list into the background queue.
 crawl([]) -> ok;
 crawl([H|T]) ->
-    io:format("Crawl: ~p~n", [H]),
+    %io:format("Crawl: ~p~n", [H]),
     db:request(H),
     crawl(T).
 
