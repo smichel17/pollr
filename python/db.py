@@ -94,7 +94,7 @@ def build_queue_db():
         cur.execute("INSERT INTO Queue VALUES('#Winter', 600)")
         cur.execute("INSERT INTO Queue VALUES('#StarWars', 500)")
         cur.execute("INSERT INTO Queue VALUES('#Adele', 300)")
-        cur.execute("INSERT INTO Queue VALUES('#College', 1000)")
+        cur.execute("INSERT INTO Queue VALUES('#College', 200)")
 
 def most_requested_hashtag_erl():
     con = lite.connect('./db/sentiment.db')

@@ -7,7 +7,7 @@ def convert(sentence):
 
 # Removes characters that will hinder a word from being potentially scored
 def clean(tweet):
-	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?'
+	bad_characters = '`~!@$%^&*()-_=+[{]}\|;:,<.>/?\n'
 	for char in bad_characters:
 		tweet = tweet.replace(char, '')
 	return tweet
@@ -40,7 +40,7 @@ def analyze(sentence):
 # Returns a list of hashtags in a sentence
 def hashtags(tweet):
 	tweet = convert(tweet)
-	tags = [token for token in tweet.split(' ') if token.startswith("#")]
+	tags = [clean(token) for token in tweet.split(' ') if token.startswith("#")]
 	return tags
 
 # Takes a list of hashtag lists and returns the set of hashtags sorted by frequency
