@@ -74,7 +74,7 @@ background_scheduler() ->
     receive
         next -> Hashtag = db:next_hashtag(),
                 case Hashtag of
-                    not_found -> io:format("Nothing to scrape."),
+                    not_found -> io:format("Background scrape: Nothing to scrape.~n"),
                                  background_scheduler();
                     _ -> io:format("Background scrape: ~p~n", [Hashtag]),
                          analyze(Hashtag),
