@@ -3,7 +3,6 @@ import db
 
 # Converts Erlang style strings into python style strings
 def convert(sentence):
-	# print(sentence)
 	return ''.join(chr(i) for i in sentence)
 
 # Removes characters that will hinder a word from being potentially scored
