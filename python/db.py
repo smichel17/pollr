@@ -76,7 +76,7 @@ def set_hashtag_sentiment_erl(hashtag, score):
         cur = con.cursor() 
         cur.execute("SELECT Pos, Neg FROM Hashtags WHERE Hashtag=:Hashtag", {"Hashtag": hashtag})        
         con.commit()
-
+        # React accordingly -- that is add a new value or update existing one
         result = cur.fetchone()
         if result is None:
             cur.execute("INSERT INTO Hashtags VALUES(?, ?, ?)", (hashtag, score, 1-score))

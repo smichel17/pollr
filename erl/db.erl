@@ -27,6 +27,6 @@ score_of(Hashtag) ->
 update(Hashtag, Score) -> . 
 	{ok, P} = python:start([{python_path, "./python"},
                          	{python, "python3"}]),
-	Score = python:call(P, db, set_hashtag_sentiment_erl, [Hashtag, Score]),
+	python:call(P, db, set_hashtag_sentiment_erl, [Hashtag, Score]),
 	python:stop(P),
-	Score. 
+	ok. 
