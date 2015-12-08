@@ -39,7 +39,7 @@ def build_hashtag_db():
         cur = con.cursor()    
         cur.execute("DROP TABLE IF EXISTS Hashtags")
         cur.execute("CREATE TABLE Hashtags(Hashtag TEXT, Pos INT, Neg INT)")
-        cur.execute("INSERT INTO Hashtags VALUES('#Trump', 0.75, 0.25)")
+        cur.execute("INSERT INTO Hashtags VALUES('#DonaldTrump', 0.75, 0.25)")
 
 def get_hashtag_sentiment(hashtag):
     con = lite.connect('./db/sentiment.db')
