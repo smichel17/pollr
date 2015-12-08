@@ -46,7 +46,7 @@ scheduler(N) ->
         0 -> receive after ?FREQ -> scheduler(1) end;
         ?RESERVED_API_CALLS ->
             whereis(background_scheduler) ! next,
-            receive after ?FREQ -> scheduler(N-1);
+            scheduler(N-1);
         _ -> receive
                   Hashtag ->
                      io:format("Foreground scrape: ~p~n", [Hashtag]),
