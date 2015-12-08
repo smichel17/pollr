@@ -1,7 +1,7 @@
 -module(master).
 -export([start/0, test/1]).
--define(FREQ, 6000). % Priority (user-generated) API call frequency
--define(RESERVED_API_CALLS, 3).
+-define(FREQ, 10000). % Priority (user-generated) API call frequency
+-define(RESERVED_API_CALLS, 2).
 
 %% This is our MVP. Call master:test(Hashtag) and it returns the score.
 
@@ -37,7 +37,7 @@ loop(Requests) ->
         {result, Hashtag, Score, HashtagList} -> 
             io:format("result: {Hashtag, Score}: {~p, ~p}~n", [Hashtag, Score]),
             spawn(fun() -> crawl(HashtagList) end),
-            db:update(Hashtag, Score),
+            spawn(db, update, [Hashtag, Score]),
             loop(lookup(Hashtag, Requests));
         {lookup, Hashtag, Requestor} ->
             io:format("lookup: {Hashtag, Requestor}: {~p, ~p}~n", [Hashtag, Requestor]),
