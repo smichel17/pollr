@@ -24,11 +24,15 @@ next_hashtag() ->
 % If Hashtag is not in the DB, add it with counter = 1.
 % If it is, increment the counter.
 request(Hashtag) -> 
-	{ok, P} = python:start([{python_path, "./python"},
-                         	{python, "python3"}]),
-	python:call(P, db, update_requested_hashtag_erl, [Hashtag]),
-	python:stop(P),
-	ok.  
+    case score_of(Hashtag) of
+        not_found -> {ok, P} = python:start([{python_path, "./python"},
+                         	                          {python, "python3"}]),
+                     python:call(P, db, update_requested_hashtag_erl,
+                                                                [Hashtag]),
+                     python:stop(P),
+                     ok;
+        _ -> ok
+    end.
 
 remove(Hashtag) -> 
 	{ok, P} = python:start([{python_path, "./python"},
