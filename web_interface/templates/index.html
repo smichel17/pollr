@@ -13,9 +13,13 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="intro-message">
-                        <img src="{{ url_for('static', filename='pollr_bear.png') }}" alt="RoadTripAdvisor" height="300" width="auto">
+                        <h1>Pollr</h1>
                         <br>
-                        <h3>Welcome to Pollr!</br>Enter two hashtags, and let our Pollr bear crawl Twitter for you to see which one the world prefers.</h3>
+                        <img src="{{ url_for('static', filename='pollr_head.png') }}" alt="RoadTripAdvisor" height="300" width="auto">
+                        <br>
+                        <h2>Twitter Sentiment Analysis</h2>
+                        <h3>Enter two hashtags, and let our PollrBear crawl Twitter for you to see which one the world prefers.</h3>
+                        <br>
                         <form action="/sentiment" method="get">
                             <div class="form-group">
                                 <input type="text" class="form-control" placeholder="First Hashtag" name="hashtag1" autocomplete="off">
