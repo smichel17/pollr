@@ -12,6 +12,6 @@ In your virtual env, run
 `pip3 install -r requirements.txt`
 to install the necessary dependencies.
 
-`cd web_interface` and create a file called `config.erl`. In it, you must specify the node name of the Erlang node, in the format `{server_node, 'server@somehost'}`.
+`cd web_interface` and create a file called `config.erl`. In it, you must specify the node name of the Erlang node, in the format `{server_node, 'server@somehost'}.`
 
 run `python3 server.py`. Then, in a web browser, navigate to __http://127.0.0.1:5000/__. You should now be able to make queries.
