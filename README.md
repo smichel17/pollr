@@ -1,6 +1,5 @@
+# Pollr -- Twitter Crawler/Analyzer #
 <img align="right" height="260" src="web_interface/static/pollr_head.png">
-
-# Pollr -- Twitter Crawler / Analyzer #
 ##### Fall 2015 Concurrency Final Project #####
 ##### Stephen Michel, Seth Kahn, Gabe Terrell #####
 
