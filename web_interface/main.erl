@@ -3,7 +3,6 @@
 
 main([Query]) ->
 	register(ui, self()),
-	Query,
 	case file:consult("config.erl") of {ok, [{server_node, Name}]} ->
 		{master, Name} ! {lookup, Query, {ui, node()}}
 	end,
