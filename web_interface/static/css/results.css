@@ -1,0 +1,19 @@
+.results_header {
+	position: relative;
+    padding-top: 0%;
+    padding-bottom: 20%;
+    height:600px;
+}
+
+.result_text {
+    margin: 0;
+    text-shadow: 2px 2px 3px rgba(0,0,0,0.6);
+}
+
+.best_tag {
+	color:#2c3e50;
+}
+
+.bad_tag {
+	color:#2c3e50;
+}

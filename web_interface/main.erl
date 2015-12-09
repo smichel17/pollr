@@ -1,14 +1,12 @@
 #!/usr/bin/env escript
-%%! -smp enable -sname ui
-% -import(master, [test/1]).
-% -import(analyzer, [analyze_sentiment/1, analyze_hashtags/1]).
-% -import(scraper, [scrape/1]).
-% -import(concurrency, [map/2]).
+%%! -smp enable -name ui -setcookie twerlang  -kernel inet_dist_listen_min 9000  inet_dist_listen_max 9005
 
 main([Query]) ->
 	register(ui, self()),
-	{master, 'server@Seths-MacBook-Pro'} ! {lookup, Query, {ui, node()}},
-	
+	Query,
+	case file:consult("config.erl") of {ok, [{server_node, Name}]} ->
+		{master, Name} ! {lookup, Query, {ui, node()}}
+	end,
 	receive
 		{_Hashtag, Score} -> io:format("~p~n", [Score])
 	end.
