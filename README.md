@@ -1,8 +1,8 @@
-# Pollr -- Twitter Sentiment Analysis #
+<img align="right" height="260" src="web_interface/static/pollr_head.png">
+
+# Pollr -- Twitter Crawler / Analyzer #
 ##### Fall 2015 Concurrency Final Project #####
 ##### Stephen Michel, Seth Kahn, Gabe Terrell #####
-
-<img align="right" height="260" src="web_interface/static/pollr_head.png">
 
 # Overview
 Pollr is a sentiment analysis application and web crawler that determines how the general public feels about a particular subject. To do so, pollr examine data related to tweets that are tagged with particular hashtags.
