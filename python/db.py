@@ -66,7 +66,10 @@ def get_hashtag_sentiment_log(hashtag):
         result = cur.fetchone()
         if result is None:
             return None
-        return math.log(result[0]), math.log(result[1])
+        try:
+            return math.log(result[0]), math.log(result[1])
+        except:
+            return 0.5, 0.5
 
 def set_hashtag_sentiment_erl(hashtag, score):
     hashtag = convert(hashtag)
