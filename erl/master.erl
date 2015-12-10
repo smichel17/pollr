@@ -14,13 +14,6 @@ test(Query) ->
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-flush() ->
-    receive
-       M -> io:format("FLUSHING: ~p~n",[M]),
-            flush()
-    %after 1 -> ok
-    end.
-
 %% Core Functions %%
 
 start() ->
@@ -32,12 +25,11 @@ start() ->
 % Listen for and keep track of requests and results. Message as appropriate.
 loop(Requests) ->
     io:format("Requests: ~p~n", [Requests]),
-    %flush(),
     receive
         {result, Hashtag, Score, HashtagList} -> 
             io:format("result: {Hashtag, Score}: {~p, ~p}~n", [Hashtag, Score]),
             spawn(fun() -> crawl(HashtagList) end),
-            spawn(db, update, [Hashtag, Score]),
+            db:update(Hashtag, Score),
             loop(lookup(Hashtag, Requests));
         {lookup, Hashtag, Requestor} ->
             io:format("lookup: {Hashtag, Requestor}: {~p, ~p}~n", [Hashtag, Requestor]),
@@ -88,8 +80,6 @@ background_scheduler() ->
 % Put all hashtags in the list into the background queue.
 crawl([]) -> ok;
 crawl([H|T]) ->
-    %io:format("."),
-    %io:format("Crawl: ~p~n", [H]),
     db:request(H),
     crawl(T).
 
