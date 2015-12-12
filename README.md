@@ -39,7 +39,7 @@ run `python3 server.py`. Then, in a web browser, navigate to __http://127.0.0.1:
 		
 * `db.erl` -- Erlang module that exports a number of wrapper functions to call the Python functions that are responsible for database interactions.
 
-* `master.erl` -- META: Stephen, write this
+* `master.erl` -- Erlang module that exports a start() function, which spawns and registers persistent processes and contains many helper functions. Controls most application logic, including scheduling to conform to Twitter’s rate limit. Spawns scrapers and makes database calls.
 
 * `scraper.erl` -- Erlang module that scrapes Twitter, using the scraper Python module, for tweets to pass onto analyzers. When analyzers return their results, this module averages the positivity ratings and also the hashtags encountered during the scrape and analysis.
 
