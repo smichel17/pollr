@@ -9,6 +9,8 @@ rel/example_project
 .concrete/DEV_MODE
 .rebar
 [vV]env/
+config.py
+config.erl
 *.pyc
 keys
 *.db
