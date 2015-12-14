@@ -15,8 +15,19 @@ to install the necessary dependencies.
 
 For Erlang, the only dependency is [Erlport](http://erlport.org/). We have included Erlport in the repository, but sometimes installation is not as easy as just having the `erlport` directory. If you are experiencing issues running the Erlang modules, try downloading Erlport [directly from their website](http://erlport.org/downloads/) instead. Be sure that the `erlport` directory is at the path `erl/erlport` in order for Pollr to run.
 
+Lastly, before using Pollr you will need to create a `db` directory within your `pollr` directory. This directory will hold your crawling database.
+
 # Use
 Once you have installed Erlport and the necessary Python dependencies, open an Erlang shell with the command `erl -env ERL_LIBS erl/erlport -name server -setcookie twerlang -kernel inet_dist_listen_min 9000 inet_dist_listen_max 9005`. By running this, we are ensuring that we have access to erlport, that our node's name is `server@host.com`, and that our cookies agree with the cookies used in the frontend web interface. We also ensure that we agree on the range of ports we will be communicating over.
+
+Once inside the shell, import the required modules:
+`c("erl/master"), c("erl/scraper"), c("erl/analyzer"), c("erl/concurrency"), c("erl/db").`
+
+First, run `db:spawn_db()` to create your database. **You should only run this the first time you use Pollr. It creates a database named `sentiment.db`, and will override your previous `sentiment.db` database if you run it again.**
+
+Once you've spawned your database, simply run `master:start()`. Your crawler is now running, but is not seeded yet. You can seed it by sending master a message in the format:
+`{master, NODE} ! {lookup, HASHTAG, REQUESTER_NODE}.`
+You should fill in `NODE`, `HASHTAG`, and `REQUESTER_NODE` with the appropriate values. You can also use our web interface to make queries and seed your database.
 
 To use Pollr's web interface, cd `web_interface` and create a file called `config.erl`. In it, you must specify the node name of the Erlang node, in the format `{server_node, 'server@somehost'}.` This identifies the Erlang node that is running in the background, which is the node our web interface will be communicating with.
 
@@ -58,5 +69,4 @@ run `python3 server.py`. Then, in a web browser, navigate to __http://127.0.0.1:
 
 ###In the `wordlists` directory:
 The wordlists directory contains a number of text files representing lists of words and their positivity ratings. Since the word list is now contained in a database, we only use these lists to populate new databases, and we have a few word lists to choose from (default is `top20000.txt`).
-
 
