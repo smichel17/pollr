@@ -33,8 +33,9 @@ def build_word_db():
 def get_word_sentiment(word):
     con = lite.connect('./db/sentiment.db')
     with con:
-        cur = con.cursor()    
-        cur.execute("SELECT Pos, Neg FROM Words WHERE Word=:Word", {"Word": word})        
+        cur = con.cursor()
+        params = {"Word": word}
+        cur.execute("SELECT Pos, Neg FROM Words WHERE Word=:Word", params)        
         con.commit()
         return cur.fetchone()
 
@@ -49,8 +50,9 @@ def get_hashtag_sentiment_erl(hashtag):
     hashtag = convert(hashtag)
     con = lite.connect('./db/sentiment.db')
     with con:
-        cur = con.cursor()    
-        cur.execute("SELECT Pos FROM Hashtags WHERE Hashtag=:Hashtag", {"Hashtag": hashtag})        
+        cur = con.cursor()
+        params = {"Hashtag": hashtag}
+        cur.execute("SELECT Pos FROM Hashtags WHERE Hashtag=:Hashtag", params)        
         con.commit()
         result = cur.fetchone()
         if result is None:
@@ -60,8 +62,9 @@ def get_hashtag_sentiment_erl(hashtag):
 def get_hashtag_sentiment_log(hashtag):
     con = lite.connect('./db/sentiment.db')
     with con:
-        cur = con.cursor()    
-        cur.execute("SELECT Pos, Neg FROM Hashtags WHERE Hashtag=:Hashtag", {"Hashtag": hashtag})        
+        cur = con.cursor()
+        params = {"Tag": hashtag}
+        cur.execute("SELECT Pos, Neg FROM Hashtags WHERE Hashtag=:Tag", params)        
         con.commit()
         result = cur.fetchone()
         if result is None:
@@ -77,14 +80,17 @@ def set_hashtag_sentiment_erl(hashtag, score):
     with con:
         # Test if hashtag is already in the db
         cur = con.cursor() 
-        cur.execute("SELECT Pos, Neg FROM Hashtags WHERE Hashtag=:Hashtag", {"Hashtag": hashtag})        
+        params = {"Tag": hashtag}
+        cur.execute("SELECT Pos, Neg FROM Hashtags WHERE Hashtag=:Tag", params)        
         con.commit()
         # React accordingly -- that is add a new value or update existing one
         result = cur.fetchone()
         if result is None:
-            cur.execute("INSERT INTO Hashtags VALUES(?, ?, ?)", (hashtag, score, 1-score))
+            params = (hashtag, score, 1-score)
+            cur.execute("INSERT INTO Hashtags VALUES(?, ?, ?)", params)
         else:
-            cur.execute("UPDATE Hashtags SET Pos=?, Neg=? WHERE Hashtag=?", (score, 1-score, hashtag))        
+            par = (score, 1-score, hashtag)
+            cur.execute("UPDATE Hashtags SET Pos=?, Neg=? WHERE Hashtag=?", par)        
             con.commit()
 
 def build_queue_db():
@@ -98,7 +104,7 @@ def most_requested_hashtag_erl():
     con = lite.connect('./db/sentiment.db')
     with con:
         cur = con.cursor() 
-        cur.execute("SELECT Hashtag, Requests FROM Queue ORDER BY Requests DESC")
+        cur.execute("SELECT Hashtag,Requests FROM Queue ORDER BY Requests DESC")
         result = cur.fetchone()
         if result is not None:
             return result[0]
@@ -110,14 +116,16 @@ def update_requested_hashtag_erl(hashtag):
     with con:
         # Test if hashtag is already in the db
         cur = con.cursor() 
-        cur.execute("SELECT Hashtag, Requests FROM Queue WHERE Hashtag=?", (hashtag,))        
+        par = (hashtag,)
+        cur.execute("SELECT Hashtag, Requests FROM Queue WHERE Hashtag=?", par)        
         con.commit()
         # React accordingly -- that is add a new value or update existing one
         result = cur.fetchone()
         if result is None:
             cur.execute("INSERT INTO Queue VALUES(?, ?)", (hashtag, 1))
         else:
-            cur.execute("UPDATE Queue SET Requests=? WHERE Hashtag=?", (result[1]+1, hashtag))        
+            params = (result[1]+1, hashtag)
+            cur.execute("UPDATE Queue SET Requests=? WHERE Hashtag=?", params)        
             con.commit()
 
 def delete_requested_hashtag_erl(hashtag):

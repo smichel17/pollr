@@ -16,10 +16,6 @@ def sentiment():
 
     positivity1 = query(hashtag1)
     positivity2 = query(hashtag2)
-    # positivity1 = 0.4
-    # positivity2 = 0.6
-    # print(hashtag1)
-    # print(hashtag2)
 
     best_tag = None
     bad_tag = None

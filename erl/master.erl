@@ -32,13 +32,16 @@ loop(Requests) ->
             db:update(Hashtag, Score),
             loop(lookup(Hashtag, Requests));
         {lookup, Hashtag, Requestor} ->
-            io:format("lookup: {Hashtag, Requestor}: {~p, ~p}~n", [Hashtag, Requestor]),
+            io:format("lookup: {Hashtag, Requestor}: {~p, ~p}~n", 
+                      [Hashtag, Requestor]),
             Score = db:score_of(Hashtag),
             case Score of
-                not_found -> whereis(scheduler) ! Hashtag,
-                             loop([{Hashtag, Requestor}|Requests]);
-                _ -> Requestor ! {Hashtag, Score},
-                     loop(lookup(Hashtag, Requests))
+                not_found -> 
+                    whereis(scheduler) ! Hashtag,
+                    loop([{Hashtag, Requestor}|Requests]);
+                _ -> 
+                    Requestor ! {Hashtag, Score},
+                    loop(lookup(Hashtag, Requests))
             end
     end.
 
@@ -51,9 +54,9 @@ scheduler(N) ->
             whereis(background_scheduler) ! next,
             scheduler(N-1);
         _ -> receive
-                  Hashtag ->
-                     io:format("Foreground scrape: ~p~n", [Hashtag]),
-                     analyze(Hashtag), scheduler(N-1)
+                Hashtag ->
+                    io:format("Foreground scrape: ~p~n", [Hashtag]),
+                    analyze(Hashtag), scheduler(N-1)
              after ?FREQ -> scheduler(N+1)
              end
     end.
@@ -64,15 +67,18 @@ scheduler() -> scheduler(0).
 % crawl the next scheduled hashtag whenever prompted
 background_scheduler() ->
     receive
-        next -> Hashtag = db:next_hashtag(),
-                case Hashtag of
-                    not_found -> io:format("Background scrape: Nothing to scrape.~n"),
-                                 background_scheduler();
-                    _ -> io:format("Background scrape: ~p~n", [Hashtag]),
-                         analyze(Hashtag),
-                         db:remove(Hashtag),
-                         background_scheduler()
-                end
+        next -> 
+            Hashtag = db:next_hashtag(),
+            case Hashtag of
+                not_found -> 
+                    io:format("Background scrape: Nothing to scrape.~n"),
+                    background_scheduler();
+                _ -> 
+                    io:format("Background scrape: ~p~n", [Hashtag]),
+                    analyze(Hashtag),
+                    db:remove(Hashtag),
+                    background_scheduler()
+            end
     end.
 
 %% Helper Functions %%
@@ -88,9 +94,11 @@ crawl([H|T]) ->
 lookup(_Query, []) -> [];
 lookup(Query, [{Hashtag, Requestor}|T]) ->
     case Query of
-        Hashtag -> whereis(master) ! {lookup, Hashtag, Requestor},
-                   T;
-        _ -> [{Hashtag, Requestor}|lookup(Query, T)]
+        Hashtag -> 
+            whereis(master) ! {lookup, Hashtag, Requestor},
+            T;
+        _ ->
+            [{Hashtag, Requestor}|lookup(Query, T)]
     end.
 
 analyze(Hashtag) -> spawn(scraper, scrape, [Hashtag]).

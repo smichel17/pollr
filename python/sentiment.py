@@ -47,28 +47,3 @@ def hashtags(tweet):
 	tweet = convert(tweet)
 	tags = [clean(token) for token in tweet.split(' ') if token.startswith("#")]
 	return tags
-
-# Takes a list of hashtag lists and returns the set of hashtags sorted by frequency
-def mergeHashTagLists(hashtagLists):
-	# flatten the list
-	all_hashtags = [convert(item) for sublist in hashtagLists for item in sublist]
-	# Calculate number of occurrences of each item
-	counts = collections.Counter(all_hashtags)
-	# Sort by occurrence and reduce the list into a set
-	return sorted(list(set(all_hashtags)), key=lambda x: -counts[x])
-
-# def main(argv):
-# 	if len(argv) < 2:
-# 		print("usage: python sentiment.py [wordlist_filename]")
-# 		os._exit(1)
-# 	print("Enter a sentence: ")
-# 	sample = input("")
-# 	# First argument is filename of word list
-# 	happy_log_probs, sad_log_probs = readList(argv[1])
-# 	happy_prob, sad_prob = analyze_sentiment(sample, happy_log_probs, sad_log_probs)
-# 	print("P(happy) = " + str(happy_prob))
-# 	print("P(sad)   = " + str(sad_prob))
-# 	return 0
-
-# if __name__ == '__main__':
-# 	main(sys.argv)

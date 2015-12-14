@@ -1,7 +1,8 @@
 import subprocess
 
 def query(hashtag):
-	p = subprocess.Popen(['./main.erl', hashtag], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+	pipe = subprocess.PIPE
+	p = subprocess.Popen(['./main.erl', hashtag], stdout=pipe, stderr=pipe)
 	out, err = p.communicate()
 	result = clean_output(str(out))
 	return float(result)

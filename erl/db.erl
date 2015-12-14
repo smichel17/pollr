@@ -1,5 +1,5 @@
 -module(db).
--export([spawn_db/0, next_hashtag/0, request/1, remove/1, score_of/1, update/2]).
+-export([spawn_db/0, next_hashtag/0, request/1, remove/1, score_of/1,update/2]).
 
 %%These all work on the DB for hashtags to be crawled %%
 
